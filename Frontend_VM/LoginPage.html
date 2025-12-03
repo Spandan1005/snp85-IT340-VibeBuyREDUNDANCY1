@@ -471,13 +471,13 @@
                     body: JSON.stringify({ email, password })
                 });
 
-                const data = await response.json();
+                const data = await response.json().catch(() => null);
 
-                if (response.ok) {
+                if (response.ok && data?.user?.id) {
                     // Store user info
                     localStorage.setItem('isLoggedIn', 'true');
                     localStorage.setItem('userId', data.user.id);
-                    localStorage.setItem('userEmail', data.user.email);
+                    localStorage.setItem('userEmail', data.user.email || email);
 
                     // Redirect to MFA page
                     window.location.href = 'MfaPage.html';

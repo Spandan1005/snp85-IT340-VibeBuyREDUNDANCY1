@@ -16,10 +16,7 @@ app.use(express.json());
 // [DATABASE_VM_IP_ADDRESS]: Replace 'localhost' with the actual IP of the Database VM
 const mongoURI = process.env.MONGODB_URI || 'mongodb://100.81.244.102:27017/vibebuy';
 
-mongoose.connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+mongoose.connect(mongoURI)
     .then(() => console.log('MongoDB Connected'))
     .catch(err => console.error('MongoDB Connection Error:', err));
 
