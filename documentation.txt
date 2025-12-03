@@ -1,0 +1,99 @@
+VibeBuy Project Documentation
+This document provides a complete overview of the VibeBuy system architecture, explaining the role of each Virtual Machine (VM) and how to deploy the code to them.
+
+Part 1: System Architecture & VM Roles
+The VibeBuy application is distributed across 4 distinct Virtual Machines to simulate a real-world production environment with separation of concerns.
+
+1. Frontend VM (Client)
+IP Address: 100.77.215.88 (Currently hosted on the DevOps VM for testing)
+Role: The "Face" of the application.
+Function:
+Hosts the HTML, CSS, and JavaScript files that run in the user's browser.
+Displays the User Interface (Login, Register, Dashboard).
+Sends requests (like "Log me in") to the Backend VM.
+Does not talk directly to the database (for security).
+2. Backend VM (Server)
+IP Address: 100.105.55.118
+Role: The "Brain" of the application.
+Function:
+Runs the Node.js/Express server (
+server.js
+).
+Receives requests from the Frontend.
+Performs logic: Hashing passwords, verifying MFA codes, validating email formats.
+Talks to the Database VM to save or retrieve data.
+3. Database VM (Storage)
+IP Address: 100.81.244.102
+Role: The "Memory" of the application.
+Function:
+Runs the MongoDB database server.
+Stores all persistent data: User accounts, hashed passwords, MFA secrets.
+Only accepts connections from the Backend VM.
+4. DevOps VM (Management)
+IP Address: 100.77.215.88
+Role: The "Manager" / "Navigator".
+Function:
+Used for orchestration, documentation, and managing the other VMs.
+In this specific setup, it is also doubling as the host for the Frontend files for ease of testing.
+Part 2: Deployment Guide
+Follow these steps to distribute the code and get the system running.
+
+Step 1: Set up the Backend VM
+Target: Backend VM (100.105.55.118)
+
+Transfer Code: Copy the entire Backend_VM folder from your development machine to this VM.
+Install Dependencies:
+Open a terminal in the Backend_VM folder.
+Run: npm install
+Start Server:
+Run: node server.js
+You should see: Server running on port 5000 and MongoDB Connected.
+Step 2: Set up the Database VM
+Target: Database VM (100.81.244.102) - Windows
+
+Install MongoDB:
+
+Download and install "MongoDB Community Server" if not already installed.
+Choose "Complete" setup and "Run as Network Service user".
+Configure Network (Crucial Step):
+
+By default, MongoDB only listens to itself (localhost). We need to change this so the Backend VM can talk to it.
+Open Notepad as Administrator: Search for "Notepad", right-click it, and select "Run as administrator".
+Open Config File: In Notepad, go to File > Open.
+Navigate to: C:\Program Files\MongoDB\Server\X.X\bin\ (replace X.X with your version, e.g., 6.0 or 7.0).
+Change the file type dropdown from "Text Documents" to "All Files".
+Select mongod.cfg and open it.
+Edit bindIp:
+Find the section that looks like this:
+net:
+  port: 27017
+  bindIp: 127.0.0.1
+Change 127.0.0.1 to 0.0.0.0. It should look like this:
+net:
+  port: 27017
+  bindIp: 0.0.0.0
+Save: Save the file (Ctrl+S) and close Notepad.
+Restart MongoDB Service:
+
+Press Win + R, type services.msc, and hit Enter.
+Find MongoDB Server in the list.
+Right-click it and select Restart.
+Note: If it fails to start, check your config file for typing errors (YAML is sensitive to spaces).
+Step 3: Run the Frontend
+Target: Your Current Machine / DevOps VM (100.77.215.88)
+
+Locate Files: Go to the Frontend_VM folder.
+Launch: Open 
+LoginPage.html
+ in your web browser (Chrome, Firefox, etc.).
+Test:
+Try to Register a new account.
+If successful, the Frontend (on your machine) talked to the Backend (on 100.105.55.118), which saved data to the Database (on 100.81.244.102).
+Troubleshooting
+"Network Error" or Nothing Happens:
+Check if the Backend VM firewall allows traffic on port 5000.
+Check if the Database VM firewall allows traffic on port 27017.
+Ensure node server.js is actually running on the Backend VM.
+"MongoDB Connection Error":
+Check if bindIp is set to 0.0.0.0 on the Database VM.
+Ensure the Backend VM can ping the Database VM IP.
