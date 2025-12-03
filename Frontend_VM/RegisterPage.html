@@ -362,6 +362,9 @@
         const errorMessage = document.getElementById('errorMessage');
         const successMessage = document.getElementById('successMessage');
 
+        // Backend base URL
+        const BACKEND_URL = 'http://100.105.55.118:5000';
+
         function showError(message) {
             errorMessage.textContent = message;
             errorMessage.classList.add('show');
@@ -406,7 +409,7 @@
 
             try {
                 // [BACKEND_VM_IP_ADDRESS]: Replace 'localhost' with the actual IP of the Backend VM
-                const backendUrl = 'http://100.105.55.118:5000/api/register';
+                const backendUrl = `${BACKEND_URL}/api/register`;
 
                 const response = await fetch(backendUrl, {
                     method: 'POST',
