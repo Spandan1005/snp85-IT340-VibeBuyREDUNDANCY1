@@ -140,7 +140,8 @@
         const errorMessage = document.getElementById('errorMessage');
 
         // [BACKEND_VM_IP_ADDRESS]: Replace 'localhost' with the actual IP of the Backend VM
-        const BACKEND_URL = 'http://100.105.55.118:5000';
+        // Backend base URL (override in browser devtools with localStorage.setItem('BACKEND_URL', '<url>'))
+        const BACKEND_URL = localStorage.getItem('BACKEND_URL') || 'http://100.105.55.118:5000';
 
         if (!userId) {
             window.location.href = 'LoginPage.html';
